@@ -6,7 +6,14 @@ This is an introductory project that I built using go. I wanted to build somethi
 
 ## Running the project
 
-To start the project copy the `.env.example` file and rename it to `.env`. Then go to OpenWeather API's website and signup to get an API key and store that in the `.env` file. Finally navigate to the directory and run
+To start the project copy the `.env.example` file and rename it to `.env`. 
+```
+cp .env.example .env
+```
+
+Then go to OpenWeather API's website and signup to get an API key and store that in the `.env` file along with your zip code and country. 
+
+Finally navigate to the directory and run
 
 ```
 go run .
