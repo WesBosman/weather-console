@@ -10,10 +10,12 @@ import (
 	"net/http"
 	"os"
 	"time"
-
+    "github.com/fogleman/gg"
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 	"github.com/joho/godotenv"
+	"github.com/golang/freetype/truetype"
+	"golang.org/x/image/font/gofont/goregular"
 )
 
 type WeatherFormat struct {
@@ -161,6 +163,61 @@ func main() {
 	p4.Title = "Information"
 	p4.Text = "Press Q (or ctrl+c) to quit."
 	p4.SetRect(0, 10, 70, 13)
+
+	windFloat := float64(windDeg)
+	centerX := float64(50)
+	centerY := float64(50)
+
+	// Use gg to create a compass as an image and set it in the console
+	arc := gg.NewContext(100, 100)
+	arc.DrawCircle(centerX, centerY, 50)
+	arc.SetRGB(128, 138, 159)
+	arc.Fill()
+	arc.DrawCircle(centerX, centerY, 35)
+	arc.SetRGB(44, 73, 127)
+	arc.Fill()
+	arc.SetRGB(0, 0, 0)
+	// Directions
+	font, err := truetype.Parse(goregular.TTF)
+	if err != nil {
+		panic("")
+	}
+	face := truetype.NewFace(font, &truetype.Options{
+		Size: 10,
+	})
+	arc.SetFontFace(face)
+	// North
+	north := "N"
+	w, h := arc.MeasureString(north)
+	arc.DrawRectangle(100, 180, w, h)
+	arc.Stroke()
+	arc.DrawStringAnchored(north, 50 - w/2, h, 0.0, 0.0)
+	// East
+	east := "E"
+	w, h = arc.MeasureString(east)
+	arc.DrawRectangle(100, 180, w, h)
+	arc.Stroke()
+	arc.DrawStringAnchored(east, 100 - w - 3, 50 + h/2, 0.0, 0.0)
+	// South
+	south := "S"
+	w, h = arc.MeasureString(south)
+	arc.DrawRectangle(100, 180, w, h)
+	arc.Stroke()
+	arc.DrawStringAnchored(south, 50 - w/2, 100 - 3, 0.0, 0.0)
+	// Width
+	west := "W"
+	w, h = arc.MeasureString(west)
+	arc.DrawRectangle(100, 180, w, h)
+	arc.Stroke()
+	arc.DrawStringAnchored(west, 3, 50 + h/2, 0.0, 0.0)
+	// Draw a line for the compass direction
+	// arc.Translate(centerX, centerY)
+	// arc.Rotate(-gg.Radians(windFloat))
+	// arc.MoveTo(0, 0)
+	// arc.LineTo(0, 30)
+	arc.Stroke()
+	arc.SavePNG("compass.png")
+
 
 	ui.Render(p, p2, p3, p4, img, table)
 
