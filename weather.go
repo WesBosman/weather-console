@@ -61,6 +61,16 @@ type WeatherFormat struct {
 	Cod      int    `json:"cod"`
 }
 
+func getImageFromFile(filePath string) (image.Image, error) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	i, _, err := image.Decode(f)
+	return i, err
+}
+
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalln("Failed to load .env file")
@@ -165,16 +175,20 @@ func main() {
 	p4.SetRect(0, 10, 70, 13)
 
 	windFloat := float64(windDeg)
-	centerX := float64(50)
-	centerY := float64(50)
+	widthX := float64(100)
+	widthY := float64(100)
+	centerX := float64(widthX / 2)
+	centerY := float64(widthY / 2)
+	outerRadius := float64(widthX / 2)
+	innerRadius := float64(widthX / 2 - 15)
 
 	// Use gg to create a compass as an image and set it in the console
-	arc := gg.NewContext(100, 100)
-	arc.DrawCircle(centerX, centerY, 50)
-	arc.SetRGB(128, 138, 159)
+	arc := gg.NewContext(int(widthX), int(widthY))
+	arc.DrawCircle(centerX, centerY, outerRadius)
+	arc.SetHexColor("#808A9F")
 	arc.Fill()
-	arc.DrawCircle(centerX, centerY, 35)
-	arc.SetRGB(44, 73, 127)
+	arc.DrawCircle(centerX, centerY, innerRadius)
+	arc.SetHexColor("#2C497F")
 	arc.Fill()
 	arc.SetRGB(0, 0, 0)
 	// Directions
@@ -183,7 +197,7 @@ func main() {
 		panic("")
 	}
 	face := truetype.NewFace(font, &truetype.Options{
-		Size: 10,
+		Size: 11,
 	})
 	arc.SetFontFace(face)
 	// North
@@ -191,35 +205,41 @@ func main() {
 	w, h := arc.MeasureString(north)
 	arc.DrawRectangle(100, 180, w, h)
 	arc.Stroke()
-	arc.DrawStringAnchored(north, 50 - w/2, h, 0.0, 0.0)
+	arc.DrawStringAnchored(north, centerX - w/2, h, 0.0, 0.0)
 	// East
 	east := "E"
 	w, h = arc.MeasureString(east)
 	arc.DrawRectangle(100, 180, w, h)
 	arc.Stroke()
-	arc.DrawStringAnchored(east, 100 - w - 3, 50 + h/2, 0.0, 0.0)
+	arc.DrawStringAnchored(east, widthX - w - 3, centerY + h/2, 0.0, 0.0)
 	// South
 	south := "S"
 	w, h = arc.MeasureString(south)
 	arc.DrawRectangle(100, 180, w, h)
 	arc.Stroke()
-	arc.DrawStringAnchored(south, 50 - w/2, 100 - 3, 0.0, 0.0)
+	arc.DrawStringAnchored(south, centerX - w/2, widthY - 3, 0.0, 0.0)
 	// Width
 	west := "W"
 	w, h = arc.MeasureString(west)
 	arc.DrawRectangle(100, 180, w, h)
 	arc.Stroke()
-	arc.DrawStringAnchored(west, 3, 50 + h/2, 0.0, 0.0)
+	arc.DrawStringAnchored(west, 3, centerY + h/2, 0.0, 0.0)
 	// Draw a line for the compass direction
-	// arc.Translate(centerX, centerY)
-	// arc.Rotate(-gg.Radians(windFloat))
-	// arc.MoveTo(0, 0)
-	// arc.LineTo(0, 30)
+	arc.Translate(centerX, centerY)
+	arc.Rotate(-gg.Radians(90))
+	arc.Rotate(-gg.Radians(windFloat))
+	arc.DrawRectangle(0, 0, 1, 30)
 	arc.Stroke()
 	arc.SavePNG("compass.png")
 
+	// Put the compass image on the dashboard
+	imageFromFile, err := getImageFromFile("compass.png")
 
-	ui.Render(p, p2, p3, p4, img, table)
+	compassImg := widgets.NewImage(imageFromFile)
+	compassImg.SetRect(70, 0, 100, 13)
+	compassImg.Title = "Wind Direction"
+
+	ui.Render(img, p, p2, p3, p4, compassImg, table)
 
 	uiEvents := ui.PollEvents()
 
