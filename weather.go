@@ -144,7 +144,7 @@ func main() {
 	p2 := widgets.NewParagraph()
 	p2.Title = "Sunrise / Sunset"
 	p2.TitleStyle.Fg = ui.ColorWhite
-	p2.Text = fmt.Sprintf("Sunrise   %v\nSunset    %v", time.UnixMilli(sunrise).Format("3:04AM"), time.UnixMilli(sunset).Format("3:04PM"))
+	p2.Text = fmt.Sprintf("Sunrise   %v\nSunset    %v", time.Unix(sunrise, 0).Format("3:04 AM"), time.Unix(sunset, 0).Format("3:04 PM"))
 	p2.SetRect(20, 5, 50, 10)
 
 	tempMin := weatherJson.Main.TempMin
@@ -157,7 +157,7 @@ func main() {
 	p3.SetRect(50, 0, 70, 5)
 
 	table := widgets.NewTable()
-	table.Title = "Wind"
+	table.Title = "Wind (MPH)"
 	table.TitleStyle.Fg = ui.ColorWhite
 	table.TextAlignment = ui.AlignCenter
 	table.RowSeparator = false
