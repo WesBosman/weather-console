@@ -132,6 +132,8 @@ func main() {
 	}
 
 	img := widgets.NewImage(image)
+	img.Monochrome = true
+	img.MonochromeThreshold = 150
 	img.SetRect(0, 0, 20, 10)
 	img.Title = main
 
@@ -175,20 +177,20 @@ func main() {
 	p4.SetRect(0, 10, 70, 13)
 
 	windFloat := float64(windDeg)
-	widthX := float64(100)
-	widthY := float64(100)
+	widthX := float64(200)
+	widthY := float64(200)
 	centerX := float64(widthX / 2)
 	centerY := float64(widthY / 2)
 	outerRadius := float64(widthX / 2)
-	innerRadius := float64(widthX / 2 - 15)
+	innerRadius := float64(widthX / 2 - 25)
 
 	// Use gg to create a compass as an image and set it in the console
 	arc := gg.NewContext(int(widthX), int(widthY))
 	arc.DrawCircle(centerX, centerY, outerRadius)
-	arc.SetHexColor("#808A9F")
+	// arc.SetHexColor("#808A9F")
 	arc.Fill()
 	arc.DrawCircle(centerX, centerY, innerRadius)
-	arc.SetHexColor("#2C497F")
+	// arc.SetHexColor("#2C497F")
 	arc.Fill()
 	arc.SetRGB(0, 0, 0)
 	// Directions
@@ -197,38 +199,35 @@ func main() {
 		panic("")
 	}
 	face := truetype.NewFace(font, &truetype.Options{
-		Size: 11,
+		Size: 22, 
+		DPI: 144.0, 
+		SubPixelsX: 8, 
+		SubPixelsY: 8,
 	})
 	arc.SetFontFace(face)
 	// North
 	north := "N"
 	w, h := arc.MeasureString(north)
-	arc.DrawRectangle(100, 180, w, h)
-	arc.Stroke()
 	arc.DrawStringAnchored(north, centerX - w/2, h, 0.0, 0.0)
 	// East
 	east := "E"
 	w, h = arc.MeasureString(east)
-	arc.DrawRectangle(100, 180, w, h)
-	arc.Stroke()
-	arc.DrawStringAnchored(east, widthX - w - 3, centerY + h/2, 0.0, 0.0)
+	arc.DrawStringAnchored(east, widthX - w - 5, centerY + h/2, 0.0, 0.0)
 	// South
 	south := "S"
 	w, h = arc.MeasureString(south)
-	arc.DrawRectangle(100, 180, w, h)
-	arc.Stroke()
-	arc.DrawStringAnchored(south, centerX - w/2, widthY - 3, 0.0, 0.0)
+	arc.DrawStringAnchored(south, centerX - w/2, widthY - 5, 0.0, 0.0)
 	// Width
 	west := "W"
 	w, h = arc.MeasureString(west)
-	arc.DrawRectangle(100, 180, w, h)
-	arc.Stroke()
 	arc.DrawStringAnchored(west, 3, centerY + h/2, 0.0, 0.0)
 	// Draw a line for the compass direction
 	arc.Translate(centerX, centerY)
 	arc.Rotate(-gg.Radians(90))
 	arc.Rotate(-gg.Radians(windFloat))
-	arc.DrawRectangle(0, 0, 1, 30)
+	arc.SetLineCapRound()
+	arc.SetLineWidth(10.0)
+	arc.DrawLine(0, 0, 4, innerRadius - 25)
 	arc.Stroke()
 	arc.SavePNG("compass.png")
 
@@ -236,6 +235,8 @@ func main() {
 	imageFromFile, err := getImageFromFile("compass.png")
 
 	compassImg := widgets.NewImage(imageFromFile)
+	compassImg.Monochrome = true
+	compassImg.MonochromeThreshold = 180
 	compassImg.SetRect(70, 0, 100, 13)
 	compassImg.Title = "Wind Direction"
 

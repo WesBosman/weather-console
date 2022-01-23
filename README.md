@@ -2,7 +2,7 @@
 
 This is an introductory project that I built using go. I wanted to build something that wouldn't take more than a couple of hours to get working.
 
-![screenshot_1](./example_1_screenshot.png)
+![screenshot_1](./example_3_screenshot.png)
 
 ## Running the project
 
